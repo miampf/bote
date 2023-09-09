@@ -15,7 +15,7 @@ async fn main() -> Result<(), anyhow::Error> {
 
     println!("Connected to veilid");
 
-    api.detach().await?;
     api.shutdown().await;
+
     Ok(())
 }
