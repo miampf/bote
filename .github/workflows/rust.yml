@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Prepare
+      run: sudo apt-get install capnproto
     - name: Build
       run: cargo build --verbose
     - name: Run tests
