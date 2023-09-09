@@ -24,7 +24,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    #[command(about = "Initialise bote")]
+    #[command(about = "Initialize bote")]
     Init,
     #[command(about = "Install a package")]
     Install,
