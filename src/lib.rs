@@ -1,6 +1,8 @@
-/// The config module contains all functions needed to configure bote.
+/// commands contains all subcommands of bote
+pub mod commands;
+/// config contains the functionality to configure bote
 pub mod config;
-/// The error module contains the error handling functionality in bote.
+/// error contains the error functionality for bote
 pub mod error;
-/// The logging module handles loggint to stdout and to files.
+/// logging contains all functions that handle the loging initialisation
 pub mod logging;

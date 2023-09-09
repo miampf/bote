@@ -5,6 +5,8 @@ use crate::error::Error;
 
 /// config_callback() is used by veilid to generate a configuration for veilid at the startup.
 pub fn config_callback(key: String) -> ConfigCallbackReturn {
+    // HACK: This contains a lot of magic values. Maybe I should write a config file in JSON
+    // instead and import it at runtime? (This code was basically copied from vldpipe: https://gitlab.com/vatueil/vldpipe/-/blob/main/src/config.rs?ref_type=heads)
     match key.as_str() {
         "program_name" => Ok(Box::new(String::from("bote"))),
         "namespace" => Ok(Box::<String>::default()),
