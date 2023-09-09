@@ -3,6 +3,7 @@ use veilid_core::{ConfigCallbackReturn, FourCC, TypedKeyGroup, TypedSecretGroup}
 
 use crate::error::Error;
 
+/// config_callback() is used by veilid to generate a configuration for veilid at the startup.
 pub fn config_callback(key: String) -> ConfigCallbackReturn {
     match key.as_str() {
         "program_name" => Ok(Box::new(String::from("bote"))),
@@ -103,6 +104,7 @@ pub fn config_callback(key: String) -> ConfigCallbackReturn {
     }
 }
 
+/// get_app_directory() returns the directory where bote keeps files (~/.bote)
 pub fn get_app_directory() -> Result<String, Error> {
     match home::home_dir() {
         Some(path) => {
@@ -118,22 +120,27 @@ pub fn get_app_directory() -> Result<String, Error> {
     }
 }
 
+/// get_veilid_table_store_path() returns the path to the veilid table store.
 pub fn get_veilid_table_store_path() -> Result<String, Error> {
     Ok(get_app_directory()? + "/table_store")
 }
 
+/// get_veilid_protected_store_path() returns the path to the veilid protected store.
 pub fn get_veilid_protected_store_path() -> Result<String, Error> {
     Ok(get_app_directory()? + "/protected_store")
 }
 
+/// get_veilid_block_store_path() returns the path to the veilid block store.
 pub fn get_veilid_block_store_path() -> Result<String, Error> {
     Ok(get_app_directory()? + "/block_store")
 }
 
+/// get_veilid_certfile_path() returns the path to the veilid certificate.
 pub fn get_veilid_certfile_path() -> Result<String, Error> {
     Ok(get_app_directory()? + "/certfile")
 }
 
+/// get_veilid_keyfile_path() returns the path to the veilid keyfile.
 pub fn get_veilid_keyfile_path() -> Result<String, Error> {
     Ok(get_app_directory()? + "/keyfile")
 }

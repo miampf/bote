@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use thiserror::Error;
 use veilid_core::VeilidAPIError;
 
+/// The bote error type.
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("failed to access or find the home directory")]

@@ -8,7 +8,7 @@ use veilid_core::VeilidUpdate;
 
 #[derive(Parser)]
 #[command(
-    author = "miampf",
+    author = "miampf <miampf@proton.me>",
     about = "A package manager build upon the veilid network."
 )]
 struct Cli {
@@ -18,6 +18,7 @@ struct Cli {
     verbosity: u8,
 }
 
+/// update_callback() is called every time if something interesting happens with veilid.
 fn update_callback(_update: VeilidUpdate) {}
 
 #[tokio::main]
