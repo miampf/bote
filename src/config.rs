@@ -103,7 +103,7 @@ pub fn config_callback(key: String) -> ConfigCallbackReturn {
     }
 }
 
-fn get_app_directory() -> Result<String, Error> {
+pub fn get_app_directory() -> Result<String, Error> {
     match home::home_dir() {
         Some(path) => {
             if let Some(path_string) = path.to_str() {
