@@ -1,7 +1,9 @@
 use std::path::Path;
+use std::process::Command;
 
 use git2::build::RepoBuilder;
 use rhai::{Engine, EvalAltResult, ImmutableString};
+use shlex::Shlex;
 
 /// setup_rhai_engine() registers all functions a build script can use for the given engine.
 pub fn setup_rhai_engine(engine: &mut Engine) {
@@ -27,8 +29,25 @@ fn clone_git_repo(repo: ImmutableString) -> Result<(), Box<EvalAltResult>> {
 }
 
 /// execute_system_command() executes a system command in the current working directory.
-fn execute_system_command(cmd: ImmutableString) {
-    todo!()
+fn execute_system_command(cmd: ImmutableString) -> Result<(), Box<EvalAltResult>> {
+    let mut lex = Shlex::new(cmd.as_str());
+
+    if lex.had_error {
+        return Err(format!("failed to parse the given command: {}", cmd).into());
+    }
+
+    let program = lex.next();
+    if program.is_none() {
+        return Err("command is empty".into());
+    }
+
+    let res = Command::new(program.unwrap()).args(lex).spawn();
+
+    if let Err(e) = res {
+        return Err(e.to_string().into());
+    }
+
+    Ok(())
 }
 
 /// download_file() downloads a file from a given URL to the current working directory.
