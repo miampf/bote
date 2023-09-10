@@ -71,7 +71,7 @@ fn download_file(
     if let Err(e) = text {
         return Err(e.to_string().into());
     }
-    let mut text = text.unwrap();
+    let text = text.unwrap();
 
     match io::copy(&mut text.as_bytes(), &mut file.unwrap()) {
         Ok(_) => Ok(()),
@@ -82,7 +82,7 @@ fn download_file(
 /// change_working_directory() changes the working directory to a new path. This path can be
 /// relative to the current working directory.
 fn change_working_directory(path: ImmutableString) {
-    todo!()
+    std::env::set_current_dir(path.as_str()).expect("failed to change working directory");
 }
 
 /// extract_lzma() extractes lzma compressed files (usually files ending in .7z or .xz).
