@@ -1,6 +1,10 @@
 mod buildscript;
 
+use rhai::Engine;
+
 /// run() runs the install subcommand which is used to install a package.
 pub fn run() {
-    todo!() // TODO: implement the install subcommand
+    // TODO: implement the install subcommand
+    let mut engine = Engine::new();
+    buildscript::setup_rhai_engine(&mut engine);
 }

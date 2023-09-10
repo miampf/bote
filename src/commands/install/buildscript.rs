@@ -1,4 +1,7 @@
-use rhai::{Engine, ImmutableString};
+use std::path::Path;
+
+use git2::build::RepoBuilder;
+use rhai::{Engine, EvalAltResult, ImmutableString};
 
 /// setup_rhai_engine() registers all functions a build script can use for the given engine.
 pub fn setup_rhai_engine(engine: &mut Engine) {
@@ -14,8 +17,13 @@ pub fn setup_rhai_engine(engine: &mut Engine) {
 }
 
 /// clone_git_repo() clones a git repository to the working directory.
-fn clone_git_repo(repo: ImmutableString) {
-    todo!()
+fn clone_git_repo(repo: ImmutableString) -> Result<(), Box<EvalAltResult>> {
+    let mut repo_builder = RepoBuilder::new();
+    let clone_result = repo_builder.clone(&repo, Path::new("/tmp/bote"));
+    match clone_result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string().into()),
+    }
 }
 
 /// execute_system_command() executes a system command in the current working directory.
