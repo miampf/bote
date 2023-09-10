@@ -3,8 +3,9 @@ use std::io::{Read, Write};
 use std::process::Command;
 use std::{fs::File, path::Path};
 
+use bzip2_rs::DecoderReader;
 use git2::build::RepoBuilder;
-use log::{debug, error, info};
+use log::{error, info};
 use lzma::LzmaReader;
 use rhai::{Engine, EvalAltResult, ImmutableString};
 use shlex::Shlex;
@@ -25,6 +26,7 @@ pub fn setup_rhai_engine(engine: &mut Engine) {
 /// clone_git_repo() clones a git repository to the working directory.
 fn clone_git_repo(repo: ImmutableString) -> Result<(), Box<EvalAltResult>> {
     info!("Cloning repository {}", repo);
+
     let mut repo_builder = RepoBuilder::new();
     let clone_result = repo_builder.clone(&repo, Path::new("/tmp/bote"));
     match clone_result {
@@ -42,6 +44,7 @@ fn clone_git_repo(repo: ImmutableString) -> Result<(), Box<EvalAltResult>> {
 /// execute_system_command() executes a system command in the current working directory.
 fn execute_system_command(cmd: ImmutableString) -> Result<(), Box<EvalAltResult>> {
     info!("Executing command {}", cmd);
+
     let mut lex = Shlex::new(cmd.as_str());
 
     if lex.had_error {
@@ -105,6 +108,7 @@ fn download_file(
 /// relative to the current working directory.
 fn change_working_directory(path: ImmutableString) -> Result<(), Box<EvalAltResult>> {
     info!("Changing working directory to {}", path);
+
     let result = std::env::set_current_dir(path.as_str());
     if let Err(e) = result {
         error!("Failed to change working directory to {}: {}", path, e);
@@ -118,6 +122,7 @@ fn change_working_directory(path: ImmutableString) -> Result<(), Box<EvalAltResu
 /// relative to the current working directory.
 fn extract_lzma(file: ImmutableString, path: ImmutableString) -> Result<(), Box<EvalAltResult>> {
     info!("Extracting LZMA archive {} to {}", file, path);
+
     let archive = File::open(file.as_str());
     if let Err(e) = archive {
         error!("Failed to open file {}: {}", file, e);
@@ -162,9 +167,34 @@ fn extract_lzma(file: ImmutableString, path: ImmutableString) -> Result<(), Box<
     Ok(())
 }
 
-/// extract_bzip2() extractes bzip2 archives (usually files ending in .bz2).
-fn extract_bzip2(file: ImmutableString) {
-    todo!()
+/// extract_bzip2() extractes bzip2 archives (usually files ending in .bz2) to a path relative to
+/// the current working directory.
+fn extract_bzip2(file: ImmutableString, path: ImmutableString) -> Result<(), Box<EvalAltResult>> {
+    info!("Extracting bzip2 archive {} to {}", file, path);
+
+    let archive = File::open(file.as_str());
+    if let Err(e) = archive {
+        error!("Failed to open file {}: {}", file, e);
+        return Err(e.to_string().into());
+    }
+    let archive = archive.unwrap();
+
+    let output_file = File::create(path.as_str());
+    if let Err(e) = output_file {
+        error!("Failed to create file {}: {}", path, e);
+        return Err(e.to_string().into());
+    }
+    let mut output_file = output_file.unwrap();
+
+    let mut decompressed_reader = DecoderReader::new(archive);
+
+    let result = io::copy(&mut decompressed_reader, &mut output_file);
+    if let Err(e) = result {
+        error!("Failed to write to {}: {}", path, e);
+        return Err(e.to_string().into());
+    }
+
+    Ok(())
 }
 
 /// extract_deflate() extractes DEFLATE archives (usually files ending in .zip or .gz).
