@@ -7,14 +7,18 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
+bzip2-rs = "0.1.2"
 clap = { version = "4.4.2", features = ["derive"] }
 fern = { version = "0.6.2", features = ["colored"] }
 futures = "0.3.28"
 git2 = "0.18.0"
 home = "0.5.5"
 humantime = "2.1.0"
+libflate = "2.0.0"
 log = "0.4.20"
+lzma = "0.2.2"
 rhai = "1.16.0"
+tar = "0.4.40"
 thiserror = "1.0.48"
 tokio = "1.32.0"
 veilid-core = "0.2.1"
