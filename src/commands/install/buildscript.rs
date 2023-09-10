@@ -1,5 +1,6 @@
-use std::path::Path;
+use std::io;
 use std::process::Command;
+use std::{fs::File, path::Path};
 
 use git2::build::RepoBuilder;
 use rhai::{Engine, EvalAltResult, ImmutableString};
@@ -50,9 +51,32 @@ fn execute_system_command(cmd: ImmutableString) -> Result<(), Box<EvalAltResult>
     Ok(())
 }
 
-/// download_file() downloads a file from a given URL to the current working directory.
-fn download_file(url: ImmutableString) {
-    todo!()
+/// download_file() downloads a file from a given URL to a path relative to the current working directory.
+fn download_file(
+    url: ImmutableString,
+    filepath: ImmutableString,
+) -> Result<(), Box<EvalAltResult>> {
+    let request = ureq::get(url.as_str()).call();
+    if let Err(e) = request {
+        return Err(e.to_string().into());
+    }
+    let request = request.unwrap();
+
+    let file = File::create(filepath.as_str());
+    if let Err(e) = file {
+        return Err(e.to_string().into());
+    }
+
+    let text = request.into_string();
+    if let Err(e) = text {
+        return Err(e.to_string().into());
+    }
+    let mut text = text.unwrap();
+
+    match io::copy(&mut text.as_bytes(), &mut file.unwrap()) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("failed to write to file: {}", e).into()),
+    }
 }
 
 /// change_working_directory() changes the working directory to a new path. This path can be
