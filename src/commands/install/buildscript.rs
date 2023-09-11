@@ -10,6 +10,7 @@ use log::{error, info};
 use lzma::LzmaReader;
 use rhai::{Engine, EvalAltResult, ImmutableString};
 use shlex::Shlex;
+use tar::Archive;
 use zip::ZipArchive;
 
 /// setup_rhai_engine() registers all functions a build script can use for the given engine.
@@ -252,6 +253,57 @@ fn extract_zip(file: ImmutableString, path: ImmutableString) -> Result<(), Box<E
 }
 
 /// extract_tar_archive() extracts a tar archive to the current working directory.
-fn extract_tar_archive(file: ImmutableString) {
-    todo!()
+fn extract_tar_archive(
+    file: ImmutableString,
+    path: ImmutableString,
+) -> Result<(), Box<EvalAltResult>> {
+    info!("Extracting tar archive {} to {}", file, path);
+
+    let archive_file = File::open(file.as_str());
+    if let Err(e) = archive_file {
+        error!("Failed to open file {}: {}", file, e);
+        return Err(e.to_string().into());
+    }
+    let mut archive = Archive::new(archive_file.unwrap());
+
+    let archive_entries = archive.entries();
+    if let Err(e) = archive_entries {
+        error!("Failed to get entries from archive {}: {}", file, e);
+        return Err(e.to_string().into());
+    }
+    let archive_entries = archive_entries.unwrap();
+
+    for file in archive_entries {
+        if let Err(e) = file {
+            error!("Failed to retrieve file from tar archive: {}", e);
+            return Err(e.to_string().into());
+        }
+        let mut file = file.unwrap();
+
+        let filepath = file.path();
+        if let Err(e) = filepath {
+            error!("Failed to retrieve path from file of archive: {}", e);
+            return Err(e.to_string().into());
+        }
+        let filepath = filepath.unwrap();
+        let filepath = filepath.to_str();
+        if filepath.is_none() {
+            error!("Failed to convert filepath to string");
+            return Err("failed to convert filepath to string".into());
+        }
+        let filepath = filepath.unwrap();
+
+        info!(
+            "Extracting {:?} to {}",
+            filepath,
+            path.to_string() + filepath
+        );
+
+        if let Err(e) = file.unpack_in(path.to_string()) {
+            error!("Failed to unpack archive entry: {}", e);
+            return Err(e.to_string().into());
+        }
+    }
+
+    Ok(())
 }
