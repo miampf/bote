@@ -7,7 +7,10 @@ use bzip2_rs::DecoderReader;
 use git2::build::RepoBuilder;
 use log::{error, info};
 use lzma::LzmaReader;
+use rhai::packages::Package;
 use rhai::{Engine, EvalAltResult, ImmutableString};
+use rhai_fs::FilesystemPackage;
+use rhai_url::UrlPackage;
 use shlex::Shlex;
 use tar::Archive;
 use zip::ZipArchive;
@@ -16,8 +19,11 @@ use zip::ZipArchive;
 // implementing the From trait for the bote error type to Box<EvalAltResult> and by extracting
 // common functionality into their own functions. But for now, this works.
 
-/// setup_rhai_engine() registers all functions a build script can use for the given engine.
+/// setup_rhai_engine() registers all functions and external packages a build script can use for the given engine.
 pub fn setup_rhai_engine(engine: &mut Engine) {
+    let url = UrlPackage::new();
+    let fs = FilesystemPackage::new();
+
     engine
         .register_fn("clone_git_repo", clone_git_repo)
         .register_fn("execute_system_command", execute_system_command)
@@ -27,6 +33,9 @@ pub fn setup_rhai_engine(engine: &mut Engine) {
         .register_fn("extract_bzip2", extract_bzip2)
         .register_fn("extract_zip", extract_zip)
         .register_fn("extract_tar_archive", extract_tar_archive);
+
+    url.register_into_engine(engine);
+    fs.register_into_engine(engine);
 }
 
 /// clone_git_repo() clones a git repository to the working directory.

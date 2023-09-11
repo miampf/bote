@@ -470,6 +470,8 @@ dependencies = [
  "humantime",
  "log",
  "rhai",
+ "rhai-fs",
+ "rhai-url",
  "rust-lzma",
  "shlex",
  "tar",
@@ -2784,6 +2786,29 @@ dependencies = [
  "rhai_codegen",
  "smallvec",
  "smartstring",
+]
+
+[[package]]
+name = "rhai-fs"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25dbb42d926025b71c7c06552a34ef50eb1b64b0ee883030f335acf5ed4b07a6"
+dependencies = [
+ "rhai",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "rhai-url"
+version = "0.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac616acfa49c1a12d944d9c41f2fd322e465c0ab992da820c769b84979428ce9"
+dependencies = [
+ "rhai",
+ "serde",
+ "serde_json",
+ "url",
 ]
 
 [[package]]
