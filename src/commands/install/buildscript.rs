@@ -1,4 +1,5 @@
 use std::io;
+use std::io::prelude::*;
 use std::io::{Read, Write};
 use std::process::Command;
 use std::{fs::File, path::Path};
@@ -9,6 +10,7 @@ use log::{error, info};
 use lzma::LzmaReader;
 use rhai::{Engine, EvalAltResult, ImmutableString};
 use shlex::Shlex;
+use zip::ZipArchive;
 
 /// setup_rhai_engine() registers all functions a build script can use for the given engine.
 pub fn setup_rhai_engine(engine: &mut Engine) {
@@ -19,7 +21,7 @@ pub fn setup_rhai_engine(engine: &mut Engine) {
         .register_fn("change_working_directory", change_working_directory)
         .register_fn("extract_lzma", extract_lzma)
         .register_fn("extract_bzip2", extract_bzip2)
-        .register_fn("extract_deflate", extract_deflate)
+        .register_fn("extract_zip", extract_zip)
         .register_fn("extract_tar_archive", extract_tar_archive);
 }
 
@@ -197,9 +199,56 @@ fn extract_bzip2(file: ImmutableString, path: ImmutableString) -> Result<(), Box
     Ok(())
 }
 
-/// extract_deflate() extractes DEFLATE archives (usually files ending in .zip or .gz).
-fn extract_deflate(file: ImmutableString) {
-    todo!()
+/// extract_zip() extractes zip archives to a path relative to the current working directory.
+fn extract_zip(file: ImmutableString, path: ImmutableString) -> Result<(), Box<EvalAltResult>> {
+    info!("Extracting zip archive {} to {}", file, path);
+
+    let archive = File::open(file.as_str());
+    if let Err(e) = archive {
+        error!("Failed to open file {}: {}", file, e);
+        return Err(e.to_string().into());
+    }
+    let archive = archive.unwrap();
+
+    let zip = ZipArchive::new(archive);
+    if let Err(e) = zip {
+        error!("Failed to extract archive: {}", e);
+        return Err(e.to_string().into());
+    }
+    let mut zip = zip.unwrap();
+
+    for i in 0..zip.len() {
+        let file = zip.by_index(i);
+        if let Err(e) = file {
+            error!("Failed to extract a file from archive: {}", e);
+            return Err(e.to_string().into());
+        }
+        let mut file = file.unwrap();
+
+        info!("Extracting file {}", file.name());
+
+        let output_file = File::create(path.to_string() + file.name());
+        if let Err(e) = output_file {
+            error!(
+                "Failed to create file {}: {}",
+                path.to_string() + file.name(),
+                e
+            );
+            return Err(e.to_string().into());
+        }
+        let mut output_file = output_file.unwrap();
+
+        if let Err(e) = std::io::copy(&mut file, &mut output_file) {
+            error!(
+                "Failed to write to file {}: {}",
+                path.to_string() + file.name(),
+                e
+            );
+            return Err(e.to_string().into());
+        }
+    }
+
+    Ok(())
 }
 
 /// extract_tar_archive() extracts a tar archive to the current working directory.
