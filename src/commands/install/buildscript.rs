@@ -1,5 +1,4 @@
 use std::io;
-use std::io::prelude::*;
 use std::io::{Read, Write};
 use std::process::Command;
 use std::{fs::File, path::Path};
@@ -12,6 +11,10 @@ use rhai::{Engine, EvalAltResult, ImmutableString};
 use shlex::Shlex;
 use tar::Archive;
 use zip::ZipArchive;
+
+// HACK: The current code style for the functions is really ugly. I should refactor it by
+// implementing the From trait for the bote error type to Box<EvalAltResult> and by extracting
+// common functionality into their own functions. But for now, this works.
 
 /// setup_rhai_engine() registers all functions a build script can use for the given engine.
 pub fn setup_rhai_engine(engine: &mut Engine) {
