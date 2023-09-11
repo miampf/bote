@@ -42,7 +42,7 @@ enum Commands {
     Upgrade,
 }
 
-fn run_subcommand(command: Commands) {
+fn run_subcommand(command: Commands) -> Result<(), anyhow::Error> {
     match command {
         Commands::Init => commands::init::run(),
         Commands::Install => commands::install::run(),

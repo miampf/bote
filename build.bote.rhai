@@ -10,7 +10,8 @@ fn bote_dependencies() {
   []
 }
 
-// Return a list of program names that should be installed and in the PATH.
+// Return a list of program names as regexes that should be installed 
+// and in the PATH.
 fn installed_program_dependencies() {
   ["cargo"]
 }
