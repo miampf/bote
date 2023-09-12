@@ -146,3 +146,8 @@ pub fn get_veilid_certfile_path() -> Result<String, Error> {
 pub fn get_veilid_keyfile_path() -> Result<String, Error> {
     Ok(get_app_directory()? + "/keyfile")
 }
+
+/// get_cache_directory() returns the path to the cache directory.
+pub fn get_cache_directory() -> Result<String, Error> {
+    Ok(get_app_directory()? + "/.cache")
+}

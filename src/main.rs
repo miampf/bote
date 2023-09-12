@@ -42,7 +42,7 @@ enum Commands {
     Upgrade,
 }
 
-fn run_subcommand(command: Commands) {
+fn run_subcommand(command: Commands) -> Result<(), anyhow::Error> {
     match command {
         Commands::Init => commands::init::run(),
         Commands::Install => commands::install::run(),
@@ -69,7 +69,7 @@ async fn main() -> Result<(), anyhow::Error> {
     }
 
     if let Some(command) = cli.command {
-        run_subcommand(command);
+        run_subcommand(command)?;
     }
 
     //let update_callback = Arc::new(update_callback);
