@@ -69,7 +69,7 @@ async fn main() -> Result<(), anyhow::Error> {
     }
 
     if let Some(command) = cli.command {
-        run_subcommand(command);
+        run_subcommand(command)?;
     }
 
     //let update_callback = Arc::new(update_callback);

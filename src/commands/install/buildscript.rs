@@ -9,7 +9,6 @@ use log::{error, info};
 use lzma::LzmaReader;
 use rhai::packages::Package;
 use rhai::{Engine, EvalAltResult, ImmutableString};
-use rhai_fs::FilesystemPackage;
 use rhai_url::UrlPackage;
 use shlex::Shlex;
 use tar::Archive;
@@ -22,7 +21,6 @@ use zip::ZipArchive;
 /// setup_rhai_engine() registers all functions and external packages a build script can use for the given engine.
 pub fn setup_rhai_engine(engine: &mut Engine) {
     let url = UrlPackage::new();
-    let fs = FilesystemPackage::new();
 
     engine
         .register_fn("clone_git_repo", clone_git_repo)
@@ -35,15 +33,22 @@ pub fn setup_rhai_engine(engine: &mut Engine) {
         .register_fn("extract_tar_archive", extract_tar_archive);
 
     url.register_into_engine(engine);
-    fs.register_into_engine(engine);
 }
 
-/// clone_git_repo() clones a git repository to the working directory.
-fn clone_git_repo(repo: ImmutableString) -> Result<(), Box<EvalAltResult>> {
+/// clone_git_repo() clones a git repository to a path relative to the working directory.
+fn clone_git_repo(repo: ImmutableString, path: ImmutableString) -> Result<(), Box<EvalAltResult>> {
     info!("Cloning repository {}", repo);
 
     let mut repo_builder = RepoBuilder::new();
-    let clone_result = repo_builder.clone(&repo, Path::new("/tmp/bote"));
+
+    let current_dir = std::env::current_dir();
+    if let Err(e) = current_dir {
+        error!("Failed to obtain current working directory");
+        return Err(e.to_string().into());
+    }
+    let current_dir = current_dir.unwrap();
+
+    let clone_result = repo_builder.clone(&repo, &current_dir.join(path.to_string()));
     match clone_result {
         Ok(_) => Ok(()),
         Err(e) => {
@@ -73,10 +78,15 @@ fn execute_system_command(cmd: ImmutableString) -> Result<(), Box<EvalAltResult>
         return Err("command is empty".into());
     }
 
-    let res = Command::new(program.unwrap()).args(lex).spawn();
-
-    if let Err(e) = res {
+    let child_command = Command::new(program.unwrap()).args(lex).spawn();
+    if let Err(e) = child_command {
         error!("Failed to execute command {}: {}", cmd, e);
+        return Err(e.to_string().into());
+    }
+    let mut child_command = child_command.unwrap();
+
+    if let Err(e) = child_command.wait() {
+        error!("Command execution of \"{}\" failed: {}", cmd, e);
         return Err(e.to_string().into());
     }
 
