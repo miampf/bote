@@ -6,3 +6,5 @@ pub mod config;
 pub mod error;
 /// logging contains all functions that handle the loging initialisation
 pub mod logging;
+/// contains code relevant to network with veilid (veilid config in config module)
+pub mod veilid;

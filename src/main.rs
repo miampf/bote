@@ -1,7 +1,5 @@
-use std::sync::Arc;
-
 use bote::commands;
-use bote::config::{config_callback, get_app_directory};
+use bote::config::get_app_directory;
 use bote::logging;
 use clap::{Parser, Subcommand};
 use log::info;
@@ -42,21 +40,18 @@ enum Commands {
     Upgrade,
 }
 
-fn run_subcommand(command: Commands) -> Result<(), anyhow::Error> {
+async fn run_subcommand(command: Commands) -> Result<(), anyhow::Error> {
     match command {
         Commands::Init => commands::init::run(),
         Commands::Install => commands::install::run(),
         Commands::Library => commands::library::run(),
         Commands::Pride => commands::pride::run(),
-        Commands::Publish => commands::publish::run(),
+        Commands::Publish => commands::publish::run().await,
         Commands::Search => commands::search::run(),
         Commands::Uninstall => commands::uninstall::run(),
         Commands::Upgrade => commands::upgrade::run(),
     }
 }
-
-/// update_callback() is called every time if something interesting happens with veilid.
-fn update_callback(_update: VeilidUpdate) {}
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
@@ -69,19 +64,8 @@ async fn main() -> Result<(), anyhow::Error> {
     }
 
     if let Some(command) = cli.command {
-        run_subcommand(command)?;
+        run_subcommand(command).await?;
     }
-
-    //let update_callback = Arc::new(update_callback);
-    //let config_callback = Arc::new(config_callback);
-    //let api = veilid_core::api_startup(update_callback, config_callback).await?;
-
-    //api.attach().await?;
-
-    //info!("Connected to veilid");
-
-    //api.detach().await?;
-    //api.shutdown().await;
 
     info!("Disconnected from veilid");
 
