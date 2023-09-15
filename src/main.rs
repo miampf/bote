@@ -3,7 +3,6 @@ use bote::config::get_app_directory;
 use bote::logging;
 use clap::{Parser, Subcommand};
 use log::info;
-use veilid_core::VeilidUpdate;
 
 #[derive(Parser)]
 #[command(
