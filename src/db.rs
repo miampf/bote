@@ -42,14 +42,14 @@ async fn create_db(connection_string: &str) -> Result<(), anyhow::Error> {
 /// open_db() opens the sqlite database and creates it if it does not exist.
 pub async fn open_db() -> Result<SqlitePool, anyhow::Error> {
     let app_dir = get_app_directory()?;
-    let sqlite_connection_string = "sqlite://".to_string() + app_dir.as_str() + "/bote.db";
-    let db_exists = Sqlite::database_exists(&sqlite_connection_string).await?;
+    let connection_string = "sqlite://".to_string() + app_dir.as_str() + "/bote.db";
+    let db_exists = Sqlite::database_exists(&connection_string).await?;
 
     if !db_exists {
-        create_db(&sqlite_connection_string).await?;
+        create_db(&connection_string).await?;
     }
 
-    let db = SqlitePool::connect(&sqlite_connection_string).await?;
+    let db = SqlitePool::connect(&connection_string).await?;
 
     Ok(db)
 }
