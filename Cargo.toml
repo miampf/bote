@@ -28,3 +28,4 @@ ureq = "2.7.1"
 veilid-core = "0.2.1"
 which = { version = "4.4.2", features = ["regex"] }
 zip = "0.6.6"
+sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite" ] }

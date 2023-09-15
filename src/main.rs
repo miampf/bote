@@ -23,33 +23,48 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     #[command(about = "Initialize bote")]
-    Init,
+    Init {},
     #[command(about = "Install a package")]
-    Install,
+    Install {},
     #[command(about = "Import or create a library")]
-    Library,
+    Library {},
     #[command(about = "Show a random silly pride flag :3")]
-    Pride,
+    Pride {},
     #[command(about = "Publish a package to a library")]
-    Publish,
+    Publish {
+        #[arg(
+            required = true,
+            short,
+            long,
+            help = "The name of the library you want to publish to"
+        )]
+        library: String,
+        #[arg(
+            required = true,
+            short,
+            long,
+            help = "The name your package should have in the library"
+        )]
+        name: String,
+    },
     #[command(about = "Search your imported libraries for a package")]
-    Search,
+    Search {},
     #[command(about = "Uninstall a package")]
-    Uninstall,
+    Uninstall {},
     #[command(about = "Upgrade installed packages")]
-    Upgrade,
+    Upgrade {},
 }
 
 async fn run_subcommand(command: Commands) -> Result<(), anyhow::Error> {
     match command {
-        Commands::Init => commands::init::run(),
-        Commands::Install => commands::install::run(),
-        Commands::Library => commands::library::run(),
-        Commands::Pride => commands::pride::run(),
-        Commands::Publish => commands::publish::run().await,
-        Commands::Search => commands::search::run(),
-        Commands::Uninstall => commands::uninstall::run(),
-        Commands::Upgrade => commands::upgrade::run(),
+        Commands::Init {} => commands::init::run(),
+        Commands::Install {} => commands::install::run(),
+        Commands::Library {} => commands::library::run(),
+        Commands::Pride {} => commands::pride::run(),
+        Commands::Publish { name, library } => commands::publish::run(name, library).await,
+        Commands::Search {} => commands::search::run(),
+        Commands::Uninstall {} => commands::uninstall::run(),
+        Commands::Upgrade {} => commands::upgrade::run(),
     }
 }
 

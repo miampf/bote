@@ -2,9 +2,11 @@
 pub mod commands;
 /// config contains the functionality to configure bote
 pub mod config;
+/// db contains functions to handle the local package database
+pub mod db;
 /// error contains the error functionality for bote
 pub mod error;
 /// logging contains all functions that handle the loging initialisation
 pub mod logging;
-/// contains code relevant to network with veilid (veilid config in config module)
+/// veilid contains code relevant to network with veilid (veilid config in config module)
 pub mod veilid;
