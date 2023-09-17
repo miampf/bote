@@ -53,3 +53,53 @@ pub async fn open_db() -> Result<SqlitePool, anyhow::Error> {
 
     Ok(db)
 }
+
+/// write_table_to_db() inserts a new library into a database.
+pub async fn write_table_to_db(
+    db: SqlitePool,
+    library_name: &str,
+    library_owner: &str,
+    dht_key: &str,
+    own: bool,
+) -> Result<(), anyhow::Error> {
+    sqlx::query(
+        "INSERT INTO libraries
+        (library_name, library_owner, DHT_key, own)
+        VALUES (?, ?, ?, ?);",
+    )
+    .bind(library_name)
+    .bind(library_owner)
+    .bind(dht_key)
+    .bind(own)
+    .execute(&db)
+    .await?;
+
+    Ok(())
+}
+
+/// write_package_to_db() inserts a new package into a database.
+pub async fn write_package_to_db(
+    db: SqlitePool,
+    pkg_name: &str,
+    pkg_owner: &str,
+    library_name: &str,
+    build_file_location: &str,
+    build_file_hash: &str,
+    own: bool,
+) -> Result<(), anyhow::Error> {
+    sqlx::query(
+        "INSERT INTO packages
+        (pkg_name, pkg_owner, library_name, build_file_location, build_file_hash, own)
+        VALUES (?, ?, ?, ?, ?, ?);",
+    )
+    .bind(pkg_name)
+    .bind(pkg_owner)
+    .bind(library_name)
+    .bind(build_file_location)
+    .bind(build_file_hash)
+    .bind(own)
+    .execute(&db)
+    .await?;
+
+    Ok(())
+}
