@@ -82,7 +82,7 @@ async fn run_subcommand(command: Commands) -> Result<(), anyhow::Error> {
         Commands::Library { command } => match command {
             LibraryCommands::Add {} => todo!(),
             LibraryCommands::Create { name, owner_name } => {
-                commands::library::create::run(name.as_str(), owner_name.as_str())
+                commands::library::create::run(name.as_str(), owner_name.as_str()).await
             }
         },
         Commands::Pride {} => commands::pride::run(),

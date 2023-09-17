@@ -1,7 +1,7 @@
+use std::fs::File;
 use std::io;
 use std::io::{Read, Write};
 use std::process::Command;
-use std::{fs::File, path::Path};
 
 use bzip2_rs::DecoderReader;
 use git2::build::RepoBuilder;
