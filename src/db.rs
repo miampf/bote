@@ -56,7 +56,7 @@ pub async fn open_db() -> Result<SqlitePool, anyhow::Error> {
 
 /// write_table_to_db() inserts a new library into a database.
 pub async fn write_table_to_db(
-    db: SqlitePool,
+    db: &SqlitePool,
     library_name: &str,
     library_owner: &str,
     dht_key: &str,
@@ -71,7 +71,7 @@ pub async fn write_table_to_db(
     .bind(library_owner)
     .bind(dht_key)
     .bind(own)
-    .execute(&db)
+    .execute(db)
     .await?;
 
     Ok(())
@@ -79,7 +79,7 @@ pub async fn write_table_to_db(
 
 /// write_package_to_db() inserts a new package into a database.
 pub async fn write_package_to_db(
-    db: SqlitePool,
+    db: &SqlitePool,
     pkg_name: &str,
     pkg_owner: &str,
     library_name: &str,
@@ -98,7 +98,7 @@ pub async fn write_package_to_db(
     .bind(build_file_location)
     .bind(build_file_hash)
     .bind(own)
-    .execute(&db)
+    .execute(db)
     .await?;
 
     Ok(())

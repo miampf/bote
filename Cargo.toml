@@ -29,3 +29,5 @@ veilid-core = "0.2.1"
 which = { version = "4.4.2", features = ["regex"] }
 zip = "0.6.6"
 sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite" ] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
